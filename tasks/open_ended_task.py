@@ -168,6 +168,7 @@ class OpenEndedTask(BaseTask):
                 pbar.update()
                 self.scheduler.step()
 
+    # RL
     def train_scst(self):
         # design especially for self-critical sequential learning
         running_reward = .0
@@ -210,7 +211,6 @@ class OpenEndedTask(BaseTask):
     def start(self):
         if os.path.isfile(os.path.join(self.checkpoint_path, "last_model.pth")):
             checkpoint = self.load_checkpoint(os.path.join(self.checkpoint_path, "last_model.pth"))
-            # use_rl = checkpoint["use_rl"]
             best_val_score = checkpoint["best_val_score"]
             patience = checkpoint["patience"]
             self.epoch = checkpoint["epoch"] + 1
@@ -222,21 +222,10 @@ class OpenEndedTask(BaseTask):
             patience = 0
 
         while True:
-            # if not use_rl:
-            #     self.train()
-            # else:
-            #     self.train_scst()
-
             self.train()
-
-            # self.evaluate_loss(self.dev_dataloader)
-
-            # val scores
             scores = self.evaluate_metrics(self.dev_dict_dataloader)
             logger.info("Validation scores %s", scores)
             val_score = scores[self.score]
-
-            # Prepare for next epoch
             best = False
             if val_score > best_val_score:
                 best_val_score = val_score
@@ -244,40 +233,22 @@ class OpenEndedTask(BaseTask):
                 best = True
             else:
                 patience += 1
-
-            # switch_to_rl = False
             exit_train = False
 
             if patience == self.patience:
-                # if not use_rl:
-                #     use_rl = True
-                #     switch_to_rl = True
-                #     patience = 0
-                #     self.optim = Adam(self.model.parameters(), lr=self.rl_learning_rate)
-                #     logger.info("Switching to RL")
-                # else:
-                #     logger.info('patience reached.')
-                #     exit_train = True
-
                 logger.info('patience reached.')
                 exit_train = True
-
-            # if switch_to_rl and not best:
-            #     self.load_checkpoint(os.path.join(self.checkpoint_path, "best_model.pth"))
 
             self.save_checkpoint({
                 'best_val_score': best_val_score,
                 'patience': patience,
-                # 'use_rl': use_rl
             })
 
             if best:
                 copyfile(os.path.join(self.checkpoint_path, "last_model.pth"), 
                         os.path.join(self.checkpoint_path, "best_model.pth"))
-
             if exit_train:
                 break
-
             self.epoch += 1
 
     def get_predictions(self):
