@@ -103,8 +103,8 @@ MODEL:
     NUM_ATTENTION_HEADS: 12
     D_MODEL: 512
     DROPOUT: .1
-    LOAD_PRETRAINED: True
-    FREEZE_WEIGHTS: True
+    LOAD_PRETRAINED: False
+    FREEZE_WEIGHTS: Flase
     PRETRAINED_NAME: "bert-base-uncased"
   TEXT_EMBEDDING:
     ARCHITECTURE: UsualEmbedding
@@ -114,3 +114,9 @@ MODEL:
     DROPOUT: .1
     WORD_EMBEDDING: null
     WORD_EMBEDDING_CACHE: null  
+  VICONSFORMER: 
+    head: 12 
+    d_model: 768
+    d_kv: 64 
+    d_ff: 3072
+

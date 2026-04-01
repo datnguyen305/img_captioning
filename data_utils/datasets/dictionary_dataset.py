@@ -38,6 +38,8 @@ class DictionaryDataset(BaseDataset):
         question = item["question"]
         question_tokens = self.vocab.encode_question(question)
         answers = item["answers"]
+        
+        # encode: image features, question 
 
         return Instance(
             question_id=item["question_id"],
